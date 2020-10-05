@@ -42,6 +42,7 @@ int main(int argc, char **argv)
 
 			// save file
 			surface.saveFile();
+			surface.testFunction();
 
 			//	create a window
 			GeometricWidget aWindow(&surface, NULL);

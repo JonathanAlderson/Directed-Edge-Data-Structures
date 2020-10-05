@@ -19,6 +19,7 @@
 #include <iostream>
 #include <cmath>
 #include <fstream>
+#include <iomanip>
 #include "face2faceindex.h"
 
 class FaceIndex2DirectedEdge : public Face2faceindex
@@ -26,11 +27,20 @@ class FaceIndex2DirectedEdge : public Face2faceindex
 public:
 
   // So we can change those for other file extensions with same code
-  const char filePrefix[13] = "../diredges/";
-  const char fileSuffix[9] = ".diredge";
+  char filePrefix[13] = "../diredges/";
+  char fileSuffix[9] = ".diredge";
 
   // Have to remake this function as will be saving different
   bool saveFile();
+
+  // Writes all the directed edges to the file
+  std::string saveDirEdges();
+
+  // Formats into a string
+  std::string formatDirEdge(int id, int edge);
+
+
+  void testFunction();
 
 
 };

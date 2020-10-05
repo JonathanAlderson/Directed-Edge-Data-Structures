@@ -57,6 +57,7 @@ SOURCES       = Ball.cpp \
 		GeometricSurfaceFaceDS.cpp \
 		GeometricWidget.cpp \
 		face2faceindex.cpp \
+		faceindex2directededge.cpp \
 		main.cpp moc_GeometricWidget.cpp
 OBJECTS       = Ball.o \
 		BallAux.o \
@@ -65,6 +66,7 @@ OBJECTS       = Ball.o \
 		GeometricSurfaceFaceDS.o \
 		GeometricWidget.o \
 		face2faceindex.o \
+		faceindex2directededge.o \
 		main.o \
 		moc_GeometricWidget.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -146,13 +148,15 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		Cartesian3.h \
 		GeometricSurfaceFaceDS.h \
 		GeometricWidget.h \
-		face2faceindex.h Ball.cpp \
+		face2faceindex.h \
+		faceindex2directededge.h Ball.cpp \
 		BallAux.cpp \
 		BallMath.cpp \
 		Cartesian3.cpp \
 		GeometricSurfaceFaceDS.cpp \
 		GeometricWidget.cpp \
 		face2faceindex.cpp \
+		faceindex2directededge.cpp \
 		main.cpp
 QMAKE_TARGET  = triangle_renderer
 DESTDIR       = 
@@ -337,8 +341,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents Ball.h BallAux.h BallMath.h Cartesian3.h GeometricSurfaceFaceDS.h GeometricWidget.h face2faceindex.h $(DISTDIR)/
-	$(COPY_FILE) --parents Ball.cpp BallAux.cpp BallMath.cpp Cartesian3.cpp GeometricSurfaceFaceDS.cpp GeometricWidget.cpp face2faceindex.cpp main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents Ball.h BallAux.h BallMath.h Cartesian3.h GeometricSurfaceFaceDS.h GeometricWidget.h face2faceindex.h faceindex2directededge.h $(DISTDIR)/
+	$(COPY_FILE) --parents Ball.cpp BallAux.cpp BallMath.cpp Cartesian3.cpp GeometricSurfaceFaceDS.cpp GeometricWidget.cpp face2faceindex.cpp faceindex2directededge.cpp main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -427,12 +431,19 @@ face2faceindex.o: face2faceindex.cpp face2faceindex.h \
 		Cartesian3.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o face2faceindex.o face2faceindex.cpp
 
+faceindex2directededge.o: faceindex2directededge.cpp faceindex2directededge.h \
+		face2faceindex.h \
+		GeometricSurfaceFaceDS.h \
+		Cartesian3.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o faceindex2directededge.o faceindex2directededge.cpp
+
 main.o: main.cpp GeometricWidget.h \
 		GeometricSurfaceFaceDS.h \
 		Cartesian3.h \
 		Ball.h \
 		BallAux.h \
-		face2faceindex.h
+		face2faceindex.h \
+		faceindex2directededge.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 moc_GeometricWidget.o: moc_GeometricWidget.cpp 

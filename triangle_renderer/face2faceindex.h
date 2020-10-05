@@ -19,6 +19,7 @@
 #include <iostream>
 #include <cmath>
 #include <fstream>
+#include <iomanip>
 #include "GeometricSurfaceFaceDS.h"
 
 class Face2faceindex : public GeometricSurfaceFaceDS
@@ -31,8 +32,8 @@ public:
   char *objName;
 
   // So we can change those for other file extensions with same code
-  const char filePrefix[10] = "../dir/";
-  const char fileSuffix[6] = ".face";
+  char filePrefix[10] = "../faces/";
+  char fileSuffix[6] = ".face";
 
   long uniqueVertices;
 

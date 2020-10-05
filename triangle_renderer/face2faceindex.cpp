@@ -200,6 +200,7 @@ std::string Face2faceindex::formatFace(long i)
 //                     to ../faces/*.face
 void Face2faceindex::changeFileName()
 {
+	std::cout << "Change file name" << '\n';
   // Split the file name to find the object name
   char delimiters[] = "/.";
   char *index = strtok(this->filename, delimiters);
@@ -210,11 +211,13 @@ void Face2faceindex::changeFileName()
   strcpy(this->objName, index);
 
   // Malloc for new string
-  size_t fileLen = strlen(filePrefix) + strlen(fileSuffix) + strlen(this->objName);
+  size_t fileLen = strlen(this->filePrefix) + strlen(this->fileSuffix) + strlen(this->objName);
   this->outFileName = (char *) malloc(sizeof(char) * (fileLen + 1));
 
   // Copy components into the new string
-	strcpy(this->outFileName, filePrefix);
+	strcpy(this->outFileName, this->filePrefix);
   strcat(this->outFileName, this->objName);
-  strcat(this->outFileName, fileSuffix);
+  strcat(this->outFileName, this->fileSuffix);
+
+	std::cout << ": " << outFileName << '\n';
 }

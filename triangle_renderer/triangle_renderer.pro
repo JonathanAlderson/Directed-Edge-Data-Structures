@@ -26,7 +26,8 @@ HEADERS += Ball.h \
            Cartesian3.h \
            GeometricSurfaceFaceDS.h \
            GeometricWidget.h \
-           Face2faceindex.h
+           Face2faceindex.h \
+           faceindex2directededge.h
 SOURCES += Ball.cpp \
            BallAux.cpp \
            BallMath.cpp \
@@ -34,4 +35,5 @@ SOURCES += Ball.cpp \
            GeometricSurfaceFaceDS.cpp \
            GeometricWidget.cpp \
            Face2faceindex.cpp \
+           faceindex2directededge.cpp \
            main.cpp
