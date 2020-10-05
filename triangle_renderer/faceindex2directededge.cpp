@@ -13,6 +13,13 @@
 ///////////////////////////////////////////////////
 #include "faceindex2directededge.h"
 
+FaceIndex2DirectedEdge::FaceIndex2DirectedEdge() : Face2faceindex::Face2faceindex()
+{
+  // Sets our file prefixes and suffixes for this file type
+  filePrefix = strdup("../diredges/");
+  fileSuffix = strdup(".diredge");
+}
+
 bool FaceIndex2DirectedEdge::saveFile()
 {
   // Find the new filename
@@ -39,13 +46,6 @@ bool FaceIndex2DirectedEdge::saveFile()
   outFile << saveFaces();
 
   return 1;
-}
-
-void FaceIndex2DirectedEdge::testFunction()
-{
-  std::cout << "Test function" << '\n';
-  std::cout << this->filePrefix << '\n';
-  std::cout << this->fileSuffix << '\n';
 }
 
 std::string FaceIndex2DirectedEdge::saveDirEdges()

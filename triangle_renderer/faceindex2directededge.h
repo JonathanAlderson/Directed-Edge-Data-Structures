@@ -26,9 +26,7 @@ class FaceIndex2DirectedEdge : public Face2faceindex
 {
 public:
 
-  // So we can change those for other file extensions with same code
-  char filePrefix[13] = "../diredges/";
-  char fileSuffix[9] = ".diredge";
+  FaceIndex2DirectedEdge();
 
   // Have to remake this function as will be saving different
   bool saveFile();
@@ -38,10 +36,6 @@ public:
 
   // Formats into a string
   std::string formatDirEdge(int id, int edge);
-
-
-  void testFunction();
-
 
 };
 #endif

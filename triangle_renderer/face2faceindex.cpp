@@ -13,6 +13,13 @@
 ///////////////////////////////////////////////////
 #include "face2faceindex.h"
 
+Face2faceindex::Face2faceindex() : GeometricSurfaceFaceDS::GeometricSurfaceFaceDS()
+{
+	// Sets our file prefixes and suffixes for this file type
+  filePrefix = strdup("../faces/");
+  fileSuffix = strdup(".face");
+}
+
 // read routine returns true on success, failure otherwise
 bool Face2faceindex::ReadFileTriangleSoup(char *fileName)
 	{ // GeometricSurfaceFaceDS::ReadFileTriangleSoup()

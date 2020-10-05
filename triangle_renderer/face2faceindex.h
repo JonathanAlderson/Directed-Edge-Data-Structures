@@ -32,12 +32,14 @@ public:
   char *objName;
 
   // So we can change those for other file extensions with same code
-  char filePrefix[10] = "../faces/";
-  char fileSuffix[6] = ".face";
+  char * filePrefix;
+  char * fileSuffix;
 
   long uniqueVertices;
 
   std::vector<long> vertexID;
+
+  Face2faceindex();
 
   bool ReadFileTriangleSoup(char *fileName);
 
