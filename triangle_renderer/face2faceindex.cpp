@@ -111,18 +111,8 @@ bool Face2faceindex::saveFile()
   // Need to do this first, so we can find unique vertices
   std::string verticesInfo = saveVertices();
 
-  outFile << "# University of Leeds 2020-2021\n";
-  outFile << "# COMP 5812M Assignment 1\n";
-  outFile << "# Jonathan Alderson\n";
-  outFile << "# 201094818\n";
-  outFile << "#\n";
-  outFile << "# Object Name: ";
-  outFile << this->objName << "\n";
-  outFile << "# Vertices=";
-  outFile << std::to_string(uniqueVertices);
-  outFile << " Faces=";
-  outFile << std::to_string(vertices.size()/3) << "\n";
-  outFile << "#\n";
+	// Next add the header
+	outFile << saveHeader();
 
   // Save all the vertices to the file
   outFile << verticesInfo;
@@ -130,14 +120,32 @@ bool Face2faceindex::saveFile()
   // Save all the faces to the file
   outFile << saveFaces();
 
-  return 1;
+  return true;
+}
+
+std::string Face2faceindex::saveHeader()
+{
+  std::string out = "";
+	out.append("# University of Leeds 2020-2021\n");
+  out.append("# COMP 5812M Assignment 1\n");
+  out.append("# Jonathan Alderson\n");
+  out.append("# 201094818\n");
+  out.append("#\n");
+  out.append("# Object Name: ");
+  out.append(this->objName);
+  out.append("\n# Vertices=");
+  out.append(std::to_string(this->uniqueVertices));
+  out.append(" Faces=");
+  out.append(std::to_string(this->vertices.size()/3));
+  out.append("\n#\n");
+  return out;
 }
 
 std::string Face2faceindex::saveVertices()
 {
   std::string out = "";
   long writeID = 0;
-  for(unsigned long i = 0; i < vertices.size(); i++)
+  for(unsigned long i = 0; i < this->vertices.size(); i++)
   {
     if(writeID == vertexID[i])
     {
@@ -202,14 +210,11 @@ void Face2faceindex::changeFileName()
   strcpy(this->objName, index);
 
   // Malloc for new string
-  char prefix[] = "../faces/";
-  char suffix[] = ".face";
-
-  size_t fileLen = strlen(prefix) + strlen(suffix) + strlen(this->objName);
+  size_t fileLen = strlen(filePrefix) + strlen(fileSuffix) + strlen(this->objName);
   this->outFileName = (char *) malloc(sizeof(char) * (fileLen + 1));
 
   // Copy components into the new string
-	strcpy(this->outFileName, prefix);
+	strcpy(this->outFileName, filePrefix);
   strcat(this->outFileName, this->objName);
-  strcat(this->outFileName, suffix);
+  strcat(this->outFileName, fileSuffix);
 }
