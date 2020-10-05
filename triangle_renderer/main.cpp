@@ -12,6 +12,7 @@
 #include <QApplication>
 #include "GeometricWidget.h"
 #include "face2faceindex.h"
+#include "faceindex2directededge.h"
 #include <stdio.h>
 
 int main(int argc, char **argv)
@@ -23,7 +24,10 @@ int main(int argc, char **argv)
 	//GeometricSurfaceFaceDS surface;
 
 	// face reader
-	Face2faceindex surface;
+	//Face2faceindex surface;
+
+	// directed edge reader
+	FaceIndex2DirectedEdge surface;
 
 	// check the args to make sure there's an input file
 	if (argc == 2)

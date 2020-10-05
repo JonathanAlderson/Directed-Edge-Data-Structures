@@ -29,6 +29,9 @@ public:
   const char filePrefix[13] = "../diredges/";
   const char fileSuffix[9] = ".diredge";
 
+  // Have to remake this function as will be saving different
+  bool saveFile();
+
 
 };
 #endif
