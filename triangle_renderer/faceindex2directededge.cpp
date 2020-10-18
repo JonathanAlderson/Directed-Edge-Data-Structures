@@ -20,8 +20,171 @@ FaceIndex2DirectedEdge::FaceIndex2DirectedEdge() : Face2faceindex::Face2faceinde
   fileSuffix = strdup(".diredge");
 }
 
+// read routine returns true on success, failure otherwise
+bool FaceIndex2DirectedEdge::ReadFile(char *fileName)
+	{ // FaceIndex2DirectedEdge::ReadFileFace()
+
+  std::cout << "Reading File: " << fileName << '\n';
+
+	// these are for accumulating a bounding box for the object
+	Cartesian3 minCoords(1000000.0, 1000000.0, 1000000.0);
+	Cartesian3 maxCoords(-1000000.0, -1000000.0, -1000000.0);
+
+	// open the input file
+	std::ifstream inFile(fileName);
+	if (inFile.bad())
+		return false;
+
+	// set the midpoint to the origin
+	midPoint = Cartesian3(0.0, 0.0, 0.0);
+
+  std::string cLine; // current line
+  std::string delim = " ";
+  std::string token; // for reading floats from line
+  int pos = 0;
+
+  std::string a;
+  float thisX, thisY, thisZ;
+  int cVertexID; // current vertexID
+
+  // read in the header
+  while(token != "Vertex")
+  {
+    inFile >> token;
+    std::cout << token << '\n';
+    if(inFile.eof()){ std::cout << "Reached EOF Unexpectedly" << '\n'; exit(0);; }
+  }
+
+  // read in unique vertices
+  while(true)
+  {
+    // Eat Vertex after first line
+    if(pos > 0){ inFile >> token; }
+    // stop once we start reading faces
+    if(token == "Face"){ break; }
+    // Eat Vertex ID
+    inFile >> token;
+    // read float values
+    inFile >> thisX >> thisY >> thisZ;
+    // add to vertex
+    vertices.push_back(Cartesian3(thisX, thisY, thisZ));
+    pos++;
+  }
+  pos = 0;
+
+  // read in the order of vertices that make the faces
+  while(true)
+  {
+    // Eat Face after first line
+    if(pos > 0){ inFile >> token;}
+    // check for end of file
+    if(inFile.eof()){ break;}
+    // Eat face ID
+    inFile >> token;
+    // read in the 3 vertex ID's from the face
+    for(int i = 0; i < 3; i ++)
+    {
+      inFile >> cVertexID;
+      vertexID.push_back(cVertexID);
+    }
+    pos++;
+  }
+
+
+  std::cout << "Vertices; " << '\n';
+  for(unsigned int i = 0; i < vertices.size(); i++)
+  {
+    std::cout << vertices[i] << '\n';
+  }
+
+  std::cout << "Vertex ID's; " << '\n';
+  for(unsigned int i = 0; i < vertexID.size(); i++)
+  {
+    std::cout << vertexID[i] << '\n';
+  }
+
+  // calculate the midPoint / min / max / ect
+  Cartesian3 thisVertex;
+  for(unsigned int i = 0; i < vertexID.size(); i++)
+  {
+    // find the current vertex so we only lookup once
+    thisVertex = vertices[vertexID[i]];
+
+    midPoint = midPoint + thisVertex;
+
+    if (thisVertex.x < minCoords.x) minCoords.x = thisVertex.x;
+    if (thisVertex.y < minCoords.y) minCoords.y = thisVertex.y;
+    if (thisVertex.z < minCoords.z) minCoords.z = thisVertex.z;
+
+    if (thisVertex.x > maxCoords.x) maxCoords.x = thisVertex.x;
+    if (thisVertex.y > maxCoords.y) maxCoords.y = thisVertex.y;
+    if (thisVertex.z > maxCoords.z) maxCoords.z = thisVertex.z;
+  }
+
+	// now sort out the size of a bounding sphere for viewing
+	// and also set the midpoint's location
+	midPoint = midPoint / vertexID.size();
+
+	// now go back through the vertices, subtracting the mid point
+  for (unsigned int vertex = 0; vertex < vertices.size(); vertex++)
+		{ // per vertex
+		vertices[vertex] = vertices[vertex] - midPoint;
+		} // per vertex
+
+	// the bounding sphere radius is just half the distance between these
+	boundingSphereSize = sqrt((maxCoords - minCoords).length()) * 1.0;
+
+	// save the filename
+	this->filename = (char *) malloc(sizeof(char) * (strlen(fileName) + 1));
+	this->filename = strcpy(this->filename, fileName);
+
+  inFile.close();
+
+  // find the first directed edges from every vertex
+  calculateFirstDirectedEdge();
+
+  // find the other halfs
+  calculateOtherHalf();
+
+	return true;
+} // FaceIndex2DirectedEdge::ReadFileFace()
+
+void FaceIndex2DirectedEdge::debug()
+{
+    std::cout << "Debug" << '\n';
+    long a;
+    Cartesian3 b;
+    for(unsigned int i = 0; i < firstDirectedEdge.size(); i++)
+    {
+      a = firstDirectedEdge[i];
+      std::cout << a << '\n';
+    }
+
+    for(unsigned int i = 0; i < otherHalf.size(); i++)
+    {
+      a = otherHalf[i];
+      std::cout << a << '\n';
+    }
+
+    for(unsigned int i = 0; i < vertexID.size(); i++)
+    {
+      a = vertexID[i];
+      std::cout << a << '\n';
+    }
+
+    for(unsigned int i = 0; i < vertices.size(); i++)
+    {
+      b = vertices[i];
+      std::cout << b << '\n';
+    }
+
+    std::cout << "Done Debug" << '\n';
+}
+
+
 bool FaceIndex2DirectedEdge::saveFile()
 {
+  std::cout << "Saving File " << '\n';
   // Find the new filename
   changeFileName();
 
@@ -45,41 +208,112 @@ bool FaceIndex2DirectedEdge::saveFile()
   // Save all the faces to the file
   outFile << saveFaces();
 
+  // Save all the faces to the file
+  outFile << saveOtherHalf();
+
+
+  // delete this
+  debug();
+
   return 1;
 }
 
-std::string FaceIndex2DirectedEdge::saveDirEdges()
+void FaceIndex2DirectedEdge::calculateFirstDirectedEdge()
 {
-  std::string out = "";
-
   long h;
   long d;
   long f;
   long i;
 
   long writeID = 0;
-  for(unsigned long vert = 0; vert < this->vertices.size(); vert++)
+  for(unsigned long vert = 0; vert < vertexID.size(); vert ++)
   {
     h = vert;
+    // if first time we've seen this vertex
     if(writeID == vertexID[vert])
     {
       i = h % 3;
       f = h / 3;
       d = 3 * f + i;
-      out.append(formatDirEdge(writeID, d));
-      writeID ++;
+      firstDirectedEdge.push_back(d);
+      writeID++;
     }
   }
-  uniqueVertices = writeID;
+}
 
+std::string FaceIndex2DirectedEdge::saveDirEdges()
+{
+  std::string out = "";
+
+  for(unsigned long i = 0; i < firstDirectedEdge.size(); i++)
+  {
+      out.append("FirstDirectedEdge ");
+      out.append(std::to_string(i) + "   ");
+      out.append(std::to_string(firstDirectedEdge[i]) + "\n");
+  }
   return out;
 }
 
-std::string FaceIndex2DirectedEdge::formatDirEdge(int id, int edge)
+
+void FaceIndex2DirectedEdge::calculateOtherHalf()
+{
+  // start and end vertexes of edges
+  int startA, startB;
+  int endA, endB;
+
+  int matches;
+
+  otherHalf.resize(vertexID.size());
+
+  // vertexA vertexB
+  for(unsigned long vA = 0; vA < vertexID.size(); vA++)
+  {
+    matches = 0;
+
+    // modular arithmetic to calculate start and end
+    std::cout << "Luigi Time" << '\n';
+    startA = vertexID[((vA / 3) * 3) + vA % 3];
+    endA = vertexID[(((vA) / 3) * 3) + (vA+1) % 3];
+
+
+    for(unsigned long vB = 0; vB < vertexID.size(); vB++)
+    {
+      startB = vertexID[((vB / 3) * 3) + vB % 3];
+      endB = vertexID[(((vB) / 3) * 3) + (vB+1) % 3];
+
+      // we have found the other
+      if(startA == endB && endA == startB)
+      {
+        otherHalf[vA] = vB;
+        otherHalf[vB] = vA;
+        matches++;
+      }
+    }
+
+    // check for errors
+    if(matches < 1 || matches > 1)
+    {
+      std::cout << "Error: Vertex " << vA << " has " << matches << " shared edges instead of 1." << '\n';
+      //exit(0);
+    }
+  }
+
+  std::cout << "Other half completed" << '\n';
+  for(unsigned long vA = 0; vA < otherHalf.size(); vA++)
+  {
+    std::cout << otherHalf[vA] << '\n';
+  }
+}
+
+std::string FaceIndex2DirectedEdge::saveOtherHalf()
 {
   std::string out = "";
-  out.append("FirstDirectedEdge ");
-  out.append(std::to_string(id) + "   ");
-  out.append(std::to_string(edge) + "\n");
+
+  for(unsigned int i = 0; i < otherHalf.size(); i++)
+  {
+      out.append("OtherHalf ");
+      out.append(std::to_string(i) + "   ");
+      out.append(std::to_string(otherHalf[i]) + "\n");
+  }
   return out;
 }

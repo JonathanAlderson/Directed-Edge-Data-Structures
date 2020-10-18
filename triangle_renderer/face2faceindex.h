@@ -20,7 +20,15 @@
 #include <cmath>
 #include <fstream>
 #include <iomanip>
+#include <algorithm>
 #include "GeometricSurfaceFaceDS.h"
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 
 class Face2faceindex : public GeometricSurfaceFaceDS
 {
@@ -41,7 +49,7 @@ public:
 
   Face2faceindex();
 
-  bool ReadFileTriangleSoup(char *fileName);
+  bool ReadFile(char *fileName) override;
 
   // File saving functions
   // seperated out for reuse
@@ -51,10 +59,12 @@ public:
   std::string saveHeader();
 
   std::string saveVertices();
-  std::string formatVertex(long i, Cartesian3 v);
 
   std::string saveFaces();
-  std::string formatFace(long i);
+
+
+  // we need a new render function
+  void Render() override;
 
 };
 

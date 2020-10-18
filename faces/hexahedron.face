@@ -6,22 +6,14 @@
 # Object Name: hexahedron
 # Vertices=8 Faces=12
 #
-Vertex  0  -0.500000  -0.500000  -0.500000
-Vertex  1  0.500000  -0.500000  -0.500000
-Vertex  2  0.500000  -0.500000  0.500000
-Vertex  3  -0.500000  -0.500000  0.500000
-Vertex  4  -0.500000  0.500000  -0.500000
-Vertex  5  0.500000  0.500000  -0.500000
-Vertex  6  -0.500000  0.500000  0.500000
-Vertex  7  0.500000  0.500000  0.500000
-FirstDirectedEdge 0   0
-FirstDirectedEdge 1   1
-FirstDirectedEdge 2   2
-FirstDirectedEdge 3   5
-FirstDirectedEdge 4   7
-FirstDirectedEdge 5   8
-FirstDirectedEdge 6   14
-FirstDirectedEdge 7   22
+Vertex  0  -2.250000  -2.250000  -2.250000
+Vertex  1  -1.250000  -2.250000  -2.250000
+Vertex  2  -1.250000  -2.250000  -1.250000
+Vertex  3  -2.250000  -2.250000  -1.250000
+Vertex  4  -2.250000  -1.250000  -2.250000
+Vertex  5  -1.250000  -1.250000  -2.250000
+Vertex  6  -2.250000  -1.250000  -1.250000
+Vertex  7  -1.250000  -1.250000  -1.250000
 Face  0  0  1  2
 Face  1  0  2  3
 Face  2  0  4  5

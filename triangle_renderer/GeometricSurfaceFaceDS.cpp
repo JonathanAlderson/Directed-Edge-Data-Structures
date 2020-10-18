@@ -44,7 +44,7 @@ GeometricSurfaceFaceDS::GeometricSurfaceFaceDS()
 	} // GeometricSurfaceFaceDS::GeometricSurfaceFaceDS()
 
 // read routine returns true on success, failure otherwise
-bool GeometricSurfaceFaceDS::ReadFileTriangleSoup(char *fileName)
+bool GeometricSurfaceFaceDS::ReadFile(char *fileName)
 	{ // GeometricSurfaceFaceDS::ReadFileTriangleSoup()
 	// these are for accumulating a bounding box for the object
 	Cartesian3 minCoords(1000000.0, 1000000.0, 1000000.0);

@@ -6,9 +6,9 @@
 //	------------------------
 //	GeometricWidget.h
 //	------------------------
-//	
+//
 //	The main widget that shows the geometry
-//	
+//
 ///////////////////////////////////////////////////
 
 #include <math.h>
@@ -21,46 +21,50 @@
 #endif
 
 #include "GeometricWidget.h"
-static GLfloat light_position[] = {0.0, 0.0, 1.0, 0.0};							
+static GLfloat light_position[] = {0.0, 0.0, 1.0, 0.0};
 
 // constructor
-GeometricWidget::GeometricWidget(GeometricSurfaceFaceDS *newSurface, QWidget *parent)
+GeometricWidget::GeometricWidget(FaceIndex2DirectedEdge *newSurface, QWidget *parent)
 	: QGLWidget(parent)
 	{ // constructor
+
 	// store pointer to the model
 	surface = newSurface;
-	
+
 	// initialise arcballs to 80% of the widget's size
 	Ball_Init(&lightBall);		Ball_Place(&lightBall, qOne, 0.80);
 	Ball_Init(&objectBall);		Ball_Place(&objectBall, qOne, 0.80);
 
 	// initialise translation values
 	translate_x = translate_y = 0.0;
-	
+
 	// and set the button to an arbitrary value
 	whichButton = -1;
-	
+
+	std::cout << "Constructor Completed" << '\n';
 	} // constructor
 
 // destructor
 GeometricWidget::~GeometricWidget()
 	{ // destructor
 	// nothing yet
-	} // destructor																	
+	} // destructor
 
 // called when OpenGL context is set up
 void GeometricWidget::initializeGL()
 	{ // GeometricWidget::initializeGL()
 	// enable Z-buffering
 	glEnable(GL_DEPTH_TEST);
-	
+
 	// set lighting parameters
 	glShadeModel(GL_FLAT);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHTING);
-	
+
 	// background is pink
 	glClearColor(1.0, 0.7, 0.7, 1.0);
+
+	std::cout << "GlInit Completed" << '\n';
 	} // GeometricWidget::initializeGL()
 
 // called every time the widget is resized
@@ -68,28 +72,41 @@ void GeometricWidget::resizeGL(int w, int h)
 	{ // GeometricWidget::resizeGL()
 	// reset the viewport
 	glViewport(0, 0, w, h);
-	
+
 	// set projection matrix to be glOrtho based on zoom & window size
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	
+
 	// retrieve the scale factor
 	float size = surface->boundingSphereSize;
-	
+
+	std::cout << "Size" << '\n';
+	std::cout << surface->boundingSphereSize << '\n';
+	std::cout << "^^" << '\n';
+
 	// compute the aspect ratio of the widget
 	float aspectRatio = (float) w / (float) h;
-	
+
+
+	std::cout << "AR:  " << aspectRatio << '\n';
+
 	// depending on aspect ratio, set to accomodate a sphere of radius = diagonal without clipping
 	if (aspectRatio > 1.0)
 		glOrtho(-aspectRatio * size, aspectRatio * size, -size, size, -size, size);
 	else
 		glOrtho(-size, size, -size/aspectRatio, size/aspectRatio, -size, size);
 
+	std::cout << "ReziseGL Completed" << '\n';
+
 	} // GeometricWidget::resizeGL()
-	
+
 // called every time the widget needs painting
 void GeometricWidget::paintGL()
 	{ // GeometricWidget::paintGL()
+	std::cout << "PaintGL Started" << '\n';
+	std::cout << "Paint gl" << std::endl;
+
+
 	// clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -106,7 +123,7 @@ void GeometricWidget::paintGL()
 	Ball_Value(&lightBall, mNow);
 	glMultMatrixf(mNow);
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-			 
+
 	// apply translation for interface control
 	glLoadIdentity();
 	glTranslatef(translate_x, translate_y, 0.0);
@@ -116,6 +133,7 @@ void GeometricWidget::paintGL()
 	glMultMatrixf(mNow);
 
 	// now draw the surface
+	std::cout << "Calling render" << '\n';
 	surface->Render();
 	} // GeometricWidget::paintGL()
 
@@ -125,7 +143,7 @@ void GeometricWidget::mousePressEvent(QMouseEvent *event)
 	// store the button for future reference
 	whichButton = event->button();
 
-	// find the minimum of height & width	
+	// find the minimum of height & width
 	float size = (width() > height()) ? height() : width();
 
 	// convert to the ArcBall's vector type
@@ -145,7 +163,7 @@ void GeometricWidget::mousePressEvent(QMouseEvent *event)
 			updateGL();
 			break;
 		case Qt::MiddleButton:
-			// pass the point to the arcball code	
+			// pass the point to the arcball code
 			Ball_Mouse(&lightBall, vNow);
 			// start dragging
 			Ball_BeginDrag(&lightBall);
@@ -153,7 +171,7 @@ void GeometricWidget::mousePressEvent(QMouseEvent *event)
 			updateGL();
 			break;
 		case Qt::LeftButton:
-			// pass the point to the arcball code	
+			// pass the point to the arcball code
 			Ball_Mouse(&objectBall, vNow);
 			// start dragging
 			Ball_BeginDrag(&objectBall);
@@ -162,10 +180,10 @@ void GeometricWidget::mousePressEvent(QMouseEvent *event)
 			break;
 		} // button switch
 	} // GeometricWidget::mousePressEvent()
-	
+
 void GeometricWidget::mouseMoveEvent(QMouseEvent *event)
 	{ // GeometricWidget::mouseMoveEvent()
-	// find the minimum of height & width	
+	// find the minimum of height & width
 	float size = (width() > height()) ? height() : width();
 
 	// convert to the ArcBall's vector type
@@ -182,13 +200,13 @@ void GeometricWidget::mouseMoveEvent(QMouseEvent *event)
 			// subtract the translation
 			translate_x += vNow.x - last_x;
 			translate_y += vNow.y - last_y;
-			last_x = vNow.x; 
+			last_x = vNow.x;
 			last_y = vNow.y;
 			// update the widget
 			updateGL();
 			break;
 		case Qt::MiddleButton:
-			// pass it to the arcball code	
+			// pass it to the arcball code
 			Ball_Mouse(&lightBall, vNow);
 			// start dragging
 			Ball_Update(&lightBall);
@@ -196,7 +214,7 @@ void GeometricWidget::mouseMoveEvent(QMouseEvent *event)
 			updateGL();
 			break;
 		case Qt::LeftButton:
-			// pass it to the arcball code	
+			// pass it to the arcball code
 			Ball_Mouse(&objectBall, vNow);
 			// start dragging
 			Ball_Update(&objectBall);
@@ -205,7 +223,7 @@ void GeometricWidget::mouseMoveEvent(QMouseEvent *event)
 			break;
 		} // button switch
 	} // GeometricWidget::mouseMoveEvent()
-	
+
 void GeometricWidget::mouseReleaseEvent(QMouseEvent *event)
 	{ // GeometricWidget::mouseReleaseEvent()
 	// now either translate or rotate object or light
@@ -229,4 +247,14 @@ void GeometricWidget::mouseReleaseEvent(QMouseEvent *event)
 			break;
 		} // button switch
 	} // GeometricWidget::mouseReleaseEvent()
-	
+
+// escape quits the program
+void GeometricWidget::keyPressEvent(QKeyEvent* event)
+{
+    if(event->key() == Qt::Key_Escape)
+    {
+         QCoreApplication::quit();
+    }
+    else
+        QWidget::keyPressEvent(event);
+}
