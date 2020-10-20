@@ -227,11 +227,6 @@ void FaceIndex2DirectedEdge::checkPinchPoint()
       nextFirst = otherHalf[thirdEdge];
 
       thisDegree++;
-
-      if(thisDegree > 5)
-      {
-        break;
-      }
     }
     if(thisDegree != degrees[i])
     {
