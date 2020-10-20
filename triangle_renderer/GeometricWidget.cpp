@@ -41,7 +41,6 @@ GeometricWidget::GeometricWidget(FaceIndex2DirectedEdge *newSurface, QWidget *pa
 	// and set the button to an arbitrary value
 	whichButton = -1;
 
-	std::cout << "Constructor Completed" << '\n';
 	} // constructor
 
 // destructor
@@ -64,7 +63,6 @@ void GeometricWidget::initializeGL()
 	// background is pink
 	glClearColor(1.0, 0.7, 0.7, 1.0);
 
-	std::cout << "GlInit Completed" << '\n';
 	} // GeometricWidget::initializeGL()
 
 // called every time the widget is resized
@@ -80,15 +78,11 @@ void GeometricWidget::resizeGL(int w, int h)
 	// retrieve the scale factor
 	float size = surface->boundingSphereSize;
 
-	std::cout << "Size" << '\n';
-	std::cout << surface->boundingSphereSize << '\n';
-	std::cout << "^^" << '\n';
 
 	// compute the aspect ratio of the widget
 	float aspectRatio = (float) w / (float) h;
 
 
-	std::cout << "AR:  " << aspectRatio << '\n';
 
 	// depending on aspect ratio, set to accomodate a sphere of radius = diagonal without clipping
 	if (aspectRatio > 1.0)
@@ -96,16 +90,11 @@ void GeometricWidget::resizeGL(int w, int h)
 	else
 		glOrtho(-size, size, -size/aspectRatio, size/aspectRatio, -size, size);
 
-	std::cout << "ReziseGL Completed" << '\n';
-
 	} // GeometricWidget::resizeGL()
 
 // called every time the widget needs painting
 void GeometricWidget::paintGL()
 	{ // GeometricWidget::paintGL()
-	std::cout << "PaintGL Started" << '\n';
-	std::cout << "Paint gl" << std::endl;
-
 
 	// clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -133,7 +122,6 @@ void GeometricWidget::paintGL()
 	glMultMatrixf(mNow);
 
 	// now draw the surface
-	std::cout << "Calling render" << '\n';
 	surface->Render();
 	} // GeometricWidget::paintGL()
 

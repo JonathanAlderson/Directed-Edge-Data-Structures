@@ -32,6 +32,7 @@ public:
   std::vector<long> firstDirectedEdge;
   std::vector<long> otherHalf;
 
+  int manifold;
 
   FaceIndex2DirectedEdge();
 
@@ -39,17 +40,22 @@ public:
   bool saveFile();
 
   // Reads a face file
-  bool ReadFile(char *fileName) override;
+  bool ReadFile(std::string filename) override;
 
   // find the new info for .diredge files
   void calculateFirstDirectedEdge();
   void calculateOtherHalf();
 
+  // Check if the mesh has any pinch points
+  void checkPinchPoint();
+
   // Writes all the directed edges to the file
   std::string saveDirEdges();
   std::string saveOtherHalf();
 
-  void debug();
+  // Do this only if we have a manifold mesh
+  void calculateGenus();
+
 
 };
 #endif

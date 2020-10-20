@@ -44,14 +44,14 @@ GeometricSurfaceFaceDS::GeometricSurfaceFaceDS()
 	} // GeometricSurfaceFaceDS::GeometricSurfaceFaceDS()
 
 // read routine returns true on success, failure otherwise
-bool GeometricSurfaceFaceDS::ReadFile(char *fileName)
+bool GeometricSurfaceFaceDS::ReadFile(std::string fileName)
 	{ // GeometricSurfaceFaceDS::ReadFileTriangleSoup()
 	// these are for accumulating a bounding box for the object
 	Cartesian3 minCoords(1000000.0, 1000000.0, 1000000.0);
 	Cartesian3 maxCoords(-1000000.0, -1000000.0, -1000000.0);
 
 	// open the input file
-	std::ifstream inFile(fileName);
+	std::ifstream inFile(fileName.c_str());
 	if (inFile.bad())
 		return false;
 

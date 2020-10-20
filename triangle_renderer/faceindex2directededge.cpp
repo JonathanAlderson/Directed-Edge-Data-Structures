@@ -16,22 +16,28 @@
 FaceIndex2DirectedEdge::FaceIndex2DirectedEdge() : Face2faceindex::Face2faceindex()
 {
   // Sets our file prefixes and suffixes for this file type
-  filePrefix = strdup("../diredges/");
-  fileSuffix = strdup(".diredge");
+  filePrefix = "../diredges/";
+  fileSuffix = ".diredge";
+
+  // reset
+  vertices.clear();
+  vertexID.clear();
+  otherHalf.clear();
+  firstDirectedEdge.clear();
+  midPoint = Cartesian3(0., 0., 0.);
+  boundingSphereSize = 1.0;
+  manifold = 1; // innocent until proven guilty
 }
 
 // read routine returns true on success, failure otherwise
-bool FaceIndex2DirectedEdge::ReadFile(char *fileName)
+bool FaceIndex2DirectedEdge::ReadFile(std::string fileName)
 	{ // FaceIndex2DirectedEdge::ReadFileFace()
-
-  std::cout << "Reading File: " << fileName << '\n';
-
 	// these are for accumulating a bounding box for the object
 	Cartesian3 minCoords(1000000.0, 1000000.0, 1000000.0);
 	Cartesian3 maxCoords(-1000000.0, -1000000.0, -1000000.0);
 
 	// open the input file
-	std::ifstream inFile(fileName);
+	std::ifstream inFile(fileName.c_str());
 	if (inFile.bad())
 		return false;
 
@@ -51,7 +57,6 @@ bool FaceIndex2DirectedEdge::ReadFile(char *fileName)
   while(token != "Vertex")
   {
     inFile >> token;
-    std::cout << token << '\n';
     if(inFile.eof()){ std::cout << "Reached EOF Unexpectedly" << '\n'; exit(0);; }
   }
 
@@ -90,26 +95,12 @@ bool FaceIndex2DirectedEdge::ReadFile(char *fileName)
     pos++;
   }
 
-
-  std::cout << "Vertices; " << '\n';
-  for(unsigned int i = 0; i < vertices.size(); i++)
-  {
-    std::cout << vertices[i] << '\n';
-  }
-
-  std::cout << "Vertex ID's; " << '\n';
-  for(unsigned int i = 0; i < vertexID.size(); i++)
-  {
-    std::cout << vertexID[i] << '\n';
-  }
-
   // calculate the midPoint / min / max / ect
   Cartesian3 thisVertex;
   for(unsigned int i = 0; i < vertexID.size(); i++)
   {
     // find the current vertex so we only lookup once
     thisVertex = vertices[vertexID[i]];
-
     midPoint = midPoint + thisVertex;
 
     if (thisVertex.x < minCoords.x) minCoords.x = thisVertex.x;
@@ -125,18 +116,19 @@ bool FaceIndex2DirectedEdge::ReadFile(char *fileName)
 	// and also set the midpoint's location
 	midPoint = midPoint / vertexID.size();
 
+  std::cout << "MP: " << midPoint << '\n';
+
 	// now go back through the vertices, subtracting the mid point
   for (unsigned int vertex = 0; vertex < vertices.size(); vertex++)
 		{ // per vertex
-		vertices[vertex] = vertices[vertex] - midPoint;
+		vertices[vertex] = vertices[vertex] - midPoint * 2.;
 		} // per vertex
 
 	// the bounding sphere radius is just half the distance between these
 	boundingSphereSize = sqrt((maxCoords - minCoords).length()) * 1.0;
 
 	// save the filename
-	this->filename = (char *) malloc(sizeof(char) * (strlen(fileName) + 1));
-	this->filename = strcpy(this->filename, fileName);
+	this->filename = fileName;
 
   inFile.close();
 
@@ -146,50 +138,30 @@ bool FaceIndex2DirectedEdge::ReadFile(char *fileName)
   // find the other halfs
   calculateOtherHalf();
 
+  // check there are no pinch points
+  checkPinchPoint();
+
+  // now we should know if it is manifold or not
+  if(manifold == 1)
+  {
+    std::cout << "Is Manifold" << '\n';
+  }
+  else
+  {
+    std::cout << "Is Not Manifold" << '\n';
+  }
+  calculateGenus();
 	return true;
 } // FaceIndex2DirectedEdge::ReadFileFace()
-
-void FaceIndex2DirectedEdge::debug()
-{
-    std::cout << "Debug" << '\n';
-    long a;
-    Cartesian3 b;
-    for(unsigned int i = 0; i < firstDirectedEdge.size(); i++)
-    {
-      a = firstDirectedEdge[i];
-      std::cout << a << '\n';
-    }
-
-    for(unsigned int i = 0; i < otherHalf.size(); i++)
-    {
-      a = otherHalf[i];
-      std::cout << a << '\n';
-    }
-
-    for(unsigned int i = 0; i < vertexID.size(); i++)
-    {
-      a = vertexID[i];
-      std::cout << a << '\n';
-    }
-
-    for(unsigned int i = 0; i < vertices.size(); i++)
-    {
-      b = vertices[i];
-      std::cout << b << '\n';
-    }
-
-    std::cout << "Done Debug" << '\n';
-}
 
 
 bool FaceIndex2DirectedEdge::saveFile()
 {
-  std::cout << "Saving File " << '\n';
   // Find the new filename
   changeFileName();
 
   // open the input file
-  std::ofstream outFile(this->outFileName);
+  std::ofstream outFile(outFileName.c_str());
   if (outFile.bad())
     return false;
 
@@ -213,10 +185,62 @@ bool FaceIndex2DirectedEdge::saveFile()
 
 
   // delete this
-  debug();
+  //debug();
 
   return 1;
 }
+
+void FaceIndex2DirectedEdge::checkPinchPoint()
+{
+  // Calculate the degree of each face in one pass
+  std::vector<int> degrees;
+  degrees.resize(vertices.size());
+  for(unsigned int i = 0; i < vertexID.size(); i++)
+  {
+    degrees[vertexID[i]]++;
+  }
+
+  int startEdge;
+  int firstEdge;
+  int secondEdge;
+  int thirdEdge;
+  int nextFirst;
+  int thisDegree;
+
+  for(unsigned int i = 0; i < vertices.size(); i++)
+  {
+    startEdge = firstDirectedEdge[i];
+
+    firstEdge = startEdge;
+    nextFirst = -1;
+
+    thisDegree = 0;
+
+    while(nextFirst != startEdge)
+    {
+      if(thisDegree > 0)
+      {
+        firstEdge = nextFirst;
+      }
+      secondEdge = 3 * (firstEdge / 3) + (firstEdge + 1) % 3;
+      thirdEdge = 3 *  (secondEdge / 3) + (secondEdge + 1) % 3;
+      nextFirst = otherHalf[thirdEdge];
+
+      thisDegree++;
+
+      if(thisDegree > 5)
+      {
+        break;
+      }
+    }
+    if(thisDegree != degrees[i])
+    {
+      std::cout << "Not Manifold: Pinch Point Detected On Vertex: " << i << '\n';
+      manifold = 0;
+    }
+  }
+}
+
 
 void FaceIndex2DirectedEdge::calculateFirstDirectedEdge()
 {
@@ -271,7 +295,6 @@ void FaceIndex2DirectedEdge::calculateOtherHalf()
     matches = 0;
 
     // modular arithmetic to calculate start and end
-    std::cout << "Luigi Time" << '\n';
     startA = vertexID[((vA / 3) * 3) + vA % 3];
     endA = vertexID[(((vA) / 3) * 3) + (vA+1) % 3];
 
@@ -293,15 +316,9 @@ void FaceIndex2DirectedEdge::calculateOtherHalf()
     // check for errors
     if(matches < 1 || matches > 1)
     {
-      std::cout << "Error: Vertex " << vA << " has " << matches << " shared edges instead of 1." << '\n';
-      //exit(0);
+      std::cout << "Not Manifold: Vertex " << vertexID[vA] << " has " << matches << " shared edges instead of 1." << '\n';
+      manifold = 0;
     }
-  }
-
-  std::cout << "Other half completed" << '\n';
-  for(unsigned long vA = 0; vA < otherHalf.size(); vA++)
-  {
-    std::cout << otherHalf[vA] << '\n';
   }
 }
 
@@ -316,4 +333,23 @@ std::string FaceIndex2DirectedEdge::saveOtherHalf()
       out.append(std::to_string(otherHalf[i]) + "\n");
   }
   return out;
+}
+
+void FaceIndex2DirectedEdge::calculateGenus()
+{
+  long v = vertices.size();
+  long e = vertexID.size() / 2;
+  long f = vertexID.size() / 3;
+
+  // v - e + f = 2 - 2g
+  // v - e + f - 2 = -2g
+  // e + 2 - f - v = 2g
+  // g = (e + 2 - f - v) / 2
+  std::cout << "Vert: " << v << '\n';
+  std::cout << "Edges: " << e << '\n';
+  std::cout << "Faces: " << f << '\n';
+
+  long g = (e + 2 - f - v) / 2;
+  std::cout << "Genus: " << g << '\n';
+
 }

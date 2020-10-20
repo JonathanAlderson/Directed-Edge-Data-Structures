@@ -4,16 +4,15 @@
 # 201094818
 #
 # Object Name: pinch
-# Vertices=8 Faces=8
+# Vertices=7 Faces=8
 #
 Vertex  0  -1.000000  -1.000000  -1.000000
 Vertex  1  1.000000  -1.000000  1.000000
 Vertex  2  -1.000000  1.000000  1.000000
 Vertex  3  1.000000  1.000000  -1.000000
-Vertex  4  -1.000000  -1.000000  0.000000
-Vertex  5  1.000000  -1.000000  2.000000
-Vertex  6  -1.000000  1.000000  2.000000
-Vertex  7  1.000000  1.000000  0.000000
+Vertex  4  -3.000000  3.000000  1.000000
+Vertex  5  -3.000000  1.000000  3.000000
+Vertex  6  -1.000000  3.000000  3.000000
 FirstDirectedEdge 0   0
 FirstDirectedEdge 1   1
 FirstDirectedEdge 2   2
@@ -21,15 +20,14 @@ FirstDirectedEdge 3   5
 FirstDirectedEdge 4   12
 FirstDirectedEdge 5   13
 FirstDirectedEdge 6   14
-FirstDirectedEdge 7   17
 Face  0  0  1  2
 Face  1  0  2  3
 Face  2  0  3  1
 Face  3  3  2  1
 Face  4  4  5  6
-Face  5  4  6  7
-Face  6  4  7  5
-Face  7  7  6  5
+Face  5  4  2  5
+Face  6  4  6  2
+Face  7  2  6  5
 OtherHalf 0   8
 OtherHalf 1   10
 OtherHalf 2   3
@@ -42,15 +40,15 @@ OtherHalf 8   0
 OtherHalf 9   4
 OtherHalf 10   1
 OtherHalf 11   7
-OtherHalf 12   20
+OtherHalf 12   17
 OtherHalf 13   22
-OtherHalf 14   15
-OtherHalf 15   14
-OtherHalf 16   21
-OtherHalf 17   18
-OtherHalf 18   17
-OtherHalf 19   23
-OtherHalf 20   12
-OtherHalf 21   16
+OtherHalf 14   18
+OtherHalf 15   20
+OtherHalf 16   23
+OtherHalf 17   12
+OtherHalf 18   14
+OtherHalf 19   21
+OtherHalf 20   15
+OtherHalf 21   19
 OtherHalf 22   13
-OtherHalf 23   19
+OtherHalf 23   16

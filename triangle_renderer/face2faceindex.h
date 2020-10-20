@@ -20,6 +20,7 @@
 #include <cmath>
 #include <fstream>
 #include <iomanip>
+#include <sstream>
 #include <algorithm>
 #include "GeometricSurfaceFaceDS.h"
 #ifdef __APPLE__
@@ -35,13 +36,13 @@ class Face2faceindex : public GeometricSurfaceFaceDS
 public:
 
   // char names
-  char *filename;;
-  char *outFileName;
-  char *objName;
+  std::string filename;;
+  std::string outFileName;
+  std::string objName;
 
   // So we can change those for other file extensions with same code
-  char * filePrefix;
-  char * fileSuffix;
+  std::string filePrefix;
+  std::string fileSuffix;
 
   long uniqueVertices;
 
@@ -49,7 +50,7 @@ public:
 
   Face2faceindex();
 
-  bool ReadFile(char *fileName) override;
+  bool ReadFile(std::string fileName) override;
 
   // File saving functions
   // seperated out for reuse
@@ -61,7 +62,6 @@ public:
   std::string saveVertices();
 
   std::string saveFaces();
-
 
   // we need a new render function
   void Render() override;

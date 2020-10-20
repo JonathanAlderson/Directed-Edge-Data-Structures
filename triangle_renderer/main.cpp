@@ -20,11 +20,13 @@ int main(int argc, char **argv)
 	// initialize QT
 	QApplication app(argc, argv);
 
+
 	// the geometric surface
 	//GeometricSurfaceFaceDS geoSurface;
 
 	// face reader
 	Face2faceindex faceSurface;
+
 
 	// directed edge reader
 	FaceIndex2DirectedEdge faceIndexSurface;
@@ -34,32 +36,21 @@ int main(int argc, char **argv)
 	if (argc == 2)
 		{ // two parameters - read a file
 
-
-		// read the .tri file to .face file
-		if (faceSurface.ReadFile(argv[1]))
-		{ // reading .tri failed
-			// now save the file we just made
+		if(faceSurface.ReadFile(argv[1]))
+		{
 			faceSurface.saveFile();
 
-			std::cout << "File Saved" << '\n';
-
-		
-			// now read the .face file we just saved
+			// now read the file we just made
 			if(faceIndexSurface.ReadFile(faceSurface.outFileName))
 			{
-				// save file
 				faceIndexSurface.saveFile();
-
-				std::cout << "File Saved: "  << '\n';
 
 				//	create a window
 				GeometricWidget aWindow(&faceIndexSurface, NULL);
 
-				std::cout << "Resize" << '\n';
 				// 	set the initial size
 				aWindow.resize(600, 600);
 
-				std::cout << "Show" << '\n';
 				// show the window
 				aWindow.show();
 
@@ -67,8 +58,8 @@ int main(int argc, char **argv)
 				return app.exec();
 			}
 			else
-			{	// reading .face failed
-				printf("Read failed for .face file %s\n", argv[1]);
+			{
+				std::cout << "Read failed for file " << faceSurface.outFileName.c_str() << '\n';
 				exit(0);
 			}
 

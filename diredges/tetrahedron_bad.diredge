@@ -1,0 +1,32 @@
+# University of Leeds 2020-2021
+# COMP 5812M Assignment 1
+# Jonathan Alderson
+# 201094818
+#
+# Object Name: tetrahedron_bad
+# Vertices=4 Faces=4
+#
+Vertex  0  -1.000000  -1.000000  -1.000000
+Vertex  1  1.000000  -1.000000  1.000000
+Vertex  2  -1.000000  1.000000  1.000000
+Vertex  3  1.000000  1.000000  -1.000000
+FirstDirectedEdge 0   0
+FirstDirectedEdge 1   1
+FirstDirectedEdge 2   2
+FirstDirectedEdge 3   4
+Face  0  0  1  2
+Face  1  2  3  0
+Face  2  2  1  3
+Face  3  0  3  2
+OtherHalf 0   0
+OtherHalf 1   6
+OtherHalf 2   5
+OtherHalf 3   10
+OtherHalf 4   9
+OtherHalf 5   11
+OtherHalf 6   1
+OtherHalf 7   0
+OtherHalf 8   3
+OtherHalf 9   4
+OtherHalf 10   3
+OtherHalf 11   5

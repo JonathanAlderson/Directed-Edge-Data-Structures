@@ -13,31 +13,38 @@
 ///////////////////////////////////////////////////
 #include "face2faceindex.h"
 
-Face2faceindex::Face2faceindex() : GeometricSurfaceFaceDS::GeometricSurfaceFaceDS()
+Face2faceindex::Face2faceindex()// : GeometricSurfaceFaceDS::GeometricSurfaceFaceDS()
 {
 	// Sets our file prefixes and suffixes for this file type
   filePrefix = strdup("../faces/");
   fileSuffix = strdup(".face");
+
+  // reset
+  //vertices.resize(0);
+  vertexID.resize(0);
+  //midPoint = Cartesian3(0., 0., 0.);
+  boundingSphereSize = 1.0;
 }
 
 // read routine returns true on success, failure otherwise
-bool Face2faceindex::ReadFile(char *fileName)
-	{ // GeometricSurfaceFaceDS::ReadFileTriangleSoup()
-  std::cout << "Reading File: " << fileName << '\n';
+bool Face2faceindex::ReadFile(std::string fileName)
+	{ // Face2faceindex::ReadFile()
 	// these are for accumulating a bounding box for the object
 	Cartesian3 minCoords(1000000.0, 1000000.0, 1000000.0);
 	Cartesian3 maxCoords(-1000000.0, -1000000.0, -1000000.0);
 
 	// open the input file
-	std::ifstream inFile(fileName);
+	std::ifstream inFile(fileName.c_str());
 	if (inFile.bad())
 		return false;
 
 	// set the number of vertices and faces
 	long nTriangles = 0, nVertices = 0;
 
-	// set the midpoint to the origin
-	midPoint = Cartesian3(0.0, 0.0, 0.0);
+	// reset the midpoint to the origin
+	midPoint.x = 0.;
+  midPoint.y = 0.;
+  midPoint.z = 0.;
 
 	// read in the number of vertices
 	inFile >> nTriangles;
@@ -47,43 +54,49 @@ bool Face2faceindex::ReadFile(char *fileName)
   // read in vertex
   // if new, add to vertices
   // add the ID to vertexID
-  Cartesian3 thisVertex;
+  Cartesian3 thisVertex(0., 0. ,0.);
   float x, y, z;
   int uniqueCount = 0;
-  int index;
-
+  int foundIndex;
 
 	// now loop to read the vertices in, and hope nothing goes wrong
-	for (long vertex = 0; vertex < nVertices; vertex++)
+	for (int vertex = 0; vertex < nVertices; vertex++)
 	{ // for each vertex
 
     // read in the floats
 		inFile >> x >> y >> z;
 
+    // we haven't found it yet
+    foundIndex = -1;
+
     // construct temporary vertex
-    thisVertex = Cartesian3(x, y, z);
+    thisVertex.x = x;
+    thisVertex.y = y;
+    thisVertex.z = z;
 
-    std::cout << "This vertex: " << thisVertex << '\n';
-
-    // check if this is new
-    auto foundVertex = std::find(vertices.begin(), vertices.end(), thisVertex);
-    if(foundVertex == vertices.end())
+    // check if we have already seen this vertex
+    for(unsigned int i = 0; i < vertices.size(); i++)
     {
-      std::cout << "Unique adding new" << '\n';
+      if(thisVertex == vertices[i]){ foundIndex = i; break; }
+    }
+
+    if(foundIndex == -1)
+    {
       // add to list of unique vertices
       vertices.push_back(thisVertex);
+      //vertices.push_back(Cartesian3(thisVertex.x, thisVertex.y, thisVertex.z));
       // add the vertexID
       vertexID.push_back(uniqueCount);
       uniqueCount++;
     }
     else
     { // not unique so add the index
-      index = std::distance(vertices.begin(), foundVertex);
-      vertexID.push_back(index);
+      vertexID.push_back(foundIndex);
     }
 
 		// keep running track of midpoint, &c.
-		midPoint = midPoint + thisVertex;
+    midPoint = midPoint + thisVertex;
+
 		if (thisVertex.x < minCoords.x) minCoords.x = thisVertex.x;
 		if (thisVertex.y < minCoords.y) minCoords.y = thisVertex.y;
 		if (thisVertex.z < minCoords.z) minCoords.z = thisVertex.z;
@@ -91,44 +104,36 @@ bool Face2faceindex::ReadFile(char *fileName)
 		if (thisVertex.x > maxCoords.x) maxCoords.x = thisVertex.x;
 		if (thisVertex.y > maxCoords.y) maxCoords.y = thisVertex.y;
 		if (thisVertex.z > maxCoords.z) maxCoords.z = thisVertex.z;
-
-  }
-
-  for(unsigned int i = 0; i < vertexID.size(); i++)
-  {
-    std::cout << vertexID[i] << '\n';
   }
 
 	// now sort out the size of a bounding sphere for viewing
 	// and also set the midpoint's location
-	midPoint = midPoint / vertices.size();
+	midPoint = midPoint / nVertices;
 
 	// now go back through the vertices, subtracting the mid point
-	for (int vertex = 0; vertex < nVertices; vertex++)
+	for (unsigned int vertex = 0; vertex < vertices.size(); vertex++)
 		{ // per vertex
-		vertices[vertex] = vertices[vertex] - midPoint;
+  		vertices[vertex] = vertices[vertex] - midPoint;
 		} // per vertex
 
 	// the bounding sphere radius is just half the distance between these
 	boundingSphereSize = sqrt((maxCoords - minCoords).length()) * 1.0;
 
 	// save the filename
-	this->filename = (char *) malloc(sizeof(char) * (strlen(fileName) + 1));
-	this->filename = strcpy(this->filename, fileName);
+	this->filename = fileName;
 
   inFile.close();
 
 	return true;
-	} // GeometricSurfaceFaceDS::ReadFileTriangleSoup()
+	} // Face2faceindex::ReadFile()
 
 bool Face2faceindex::saveFile()
 {
-  std::cout << "Saving File " << '\n';
   // Find the new filename
   changeFileName();
 
   // open the input file
-  std::ofstream outFile(this->outFileName);
+  std::ofstream outFile(outFileName.c_str());
   if (outFile.bad())
     return false;
 
@@ -144,7 +149,7 @@ bool Face2faceindex::saveFile()
   // Save all the faces to the file
   outFile << saveFaces();
 
-  std::cout << "Saved File" << '\n';
+  outFile.close();
 
   return true;
 }
@@ -184,7 +189,6 @@ std::string Face2faceindex::saveVertices()
     out.append(std::to_string(vertices[i].z));
     out.append("\n");
   }
-  std::cout << "out: " << out << '\n';
   return out;
 }
 
@@ -211,26 +215,32 @@ std::string Face2faceindex::saveFaces()
 //                     to ../faces/*.face
 void Face2faceindex::changeFileName()
 {
-	std::cout << "Change file name" << '\n';
   // Split the file name to find the object name
-  char delimiters[] = "/.";
-  char *index = strtok(this->filename, delimiters);
-  index = strtok(NULL, delimiters);
 
-  // index is now the object name, so malloc and save
-  this->objName = (char *) malloc(sizeof(char) * (strlen(index) + 1));
-  strcpy(this->objName, index);
+  //../models/thing.face
 
-  // Malloc for new string
-  size_t fileLen = strlen(this->filePrefix) + strlen(this->fileSuffix) + strlen(this->objName);
-  this->outFileName = (char *) malloc(sizeof(char) * (fileLen + 1));
+  // Vector of string to save tokens
+  std::vector <std::string> tokens;
 
-  // Copy components into the new string
-	strcpy(this->outFileName, this->filePrefix);
-  strcat(this->outFileName, this->objName);
-  strcat(this->outFileName, this->fileSuffix);
+  // stringstream class check1
+  std::stringstream splitter(filename);
+  std::string intermediate;
 
-	std::cout << ": " << outFileName << '\n';
+  // Tokenize first by /
+  while(getline(splitter, intermediate, '/'))
+  {
+      tokens.push_back(intermediate);
+  }
+  // then tokenise again by .
+  std::stringstream splitter2(tokens[2]);
+  tokens.clear();
+  while(getline(splitter2, intermediate, '.'))
+  {
+      tokens.push_back(intermediate);
+  }
+
+  objName = tokens[0];
+  outFileName = filePrefix + objName + fileSuffix;
 }
 
 // we need a new render routine since
@@ -239,8 +249,6 @@ void Face2faceindex::Render()
 	{ // FaceIndex2DirectedEdge::Render()
 	// walk through the faces rendering each one
 	glBegin(GL_TRIANGLES);
-
-  std::cout << "Rendering " << '\n';
 
 	// we will loop in 3's, assuming CCW order
 	for (unsigned int vertex = 0; vertex < vertexID.size(); )

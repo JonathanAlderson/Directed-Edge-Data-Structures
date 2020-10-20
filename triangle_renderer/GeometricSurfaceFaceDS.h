@@ -39,7 +39,7 @@ class GeometricSurfaceFaceDS
 	GeometricSurfaceFaceDS();
 
 	// read routine returns true on success, failure otherwise
-	virtual bool ReadFile(char *fileName);
+	virtual bool ReadFile(std::string fileName);
 
 	// routine to render
 	virtual void Render();

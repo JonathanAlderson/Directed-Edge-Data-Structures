@@ -379,6 +379,8 @@ compiler_moc_header_clean:
 	-$(DEL_FILE) moc_GeometricWidget.cpp
 moc_GeometricWidget.cpp: GeometricSurfaceFaceDS.h \
 		Cartesian3.h \
+		faceindex2directededge.h \
+		face2faceindex.h \
 		Ball.h \
 		BallAux.h \
 		GeometricWidget.h \
@@ -422,6 +424,8 @@ GeometricSurfaceFaceDS.o: GeometricSurfaceFaceDS.cpp GeometricSurfaceFaceDS.h \
 GeometricWidget.o: GeometricWidget.cpp GeometricWidget.h \
 		GeometricSurfaceFaceDS.h \
 		Cartesian3.h \
+		faceindex2directededge.h \
+		face2faceindex.h \
 		Ball.h \
 		BallAux.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GeometricWidget.o GeometricWidget.cpp
@@ -440,10 +444,10 @@ faceindex2directededge.o: faceindex2directededge.cpp faceindex2directededge.h \
 main.o: main.cpp GeometricWidget.h \
 		GeometricSurfaceFaceDS.h \
 		Cartesian3.h \
-		Ball.h \
-		BallAux.h \
+		faceindex2directededge.h \
 		face2faceindex.h \
-		faceindex2directededge.h
+		Ball.h \
+		BallAux.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 moc_GeometricWidget.o: moc_GeometricWidget.cpp 
