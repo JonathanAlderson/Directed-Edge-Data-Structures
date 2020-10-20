@@ -20,13 +20,11 @@ int main(int argc, char **argv)
 	// initialize QT
 	QApplication app(argc, argv);
 
-
-	// the geometric surface
-	//GeometricSurfaceFaceDS geoSurface;
+	// clear screen
+	std::cout << "\n\n\n" << '\n';
 
 	// face reader
 	Face2faceindex faceSurface;
-
 
 	// directed edge reader
 	FaceIndex2DirectedEdge faceIndexSurface;

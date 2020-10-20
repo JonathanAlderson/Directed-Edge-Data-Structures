@@ -111,7 +111,7 @@ bool Face2faceindex::ReadFile(std::string fileName)
 	midPoint = midPoint / nVertices;
 
 	// now go back through the vertices, subtracting the mid point
-	for (unsigned int vertex = 0; vertex < vertices.size(); vertex++)
+	for (unsigned long vertex = 0; vertex < vertices.size(); vertex++)
 		{ // per vertex
   		vertices[vertex] = vertices[vertex] - midPoint;
 		} // per vertex
@@ -154,6 +154,7 @@ bool Face2faceindex::saveFile()
   return true;
 }
 
+// save with the standard header
 std::string Face2faceindex::saveHeader()
 {
   std::string out = "";
@@ -163,7 +164,7 @@ std::string Face2faceindex::saveHeader()
   out.append("# 201094818\n");
   out.append("#\n");
   out.append("# Object Name: ");
-  out.append(this->objName);
+  out.append(objName);
   out.append("\n# Vertices=");
   out.append(std::to_string(vertices.size()));
   out.append(" Faces=");
@@ -172,6 +173,7 @@ std::string Face2faceindex::saveHeader()
   return out;
 }
 
+// loop through and save vertices
 std::string Face2faceindex::saveVertices()
 {
   std::string out = "";
@@ -192,6 +194,7 @@ std::string Face2faceindex::saveVertices()
   return out;
 }
 
+// loop through and save faces
 std::string Face2faceindex::saveFaces()
 {
   std::string out = "";
@@ -215,10 +218,6 @@ std::string Face2faceindex::saveFaces()
 //                     to ../faces/*.face
 void Face2faceindex::changeFileName()
 {
-  // Split the file name to find the object name
-
-  //../models/thing.face
-
   // Vector of string to save tokens
   std::vector <std::string> tokens;
 
@@ -238,7 +237,7 @@ void Face2faceindex::changeFileName()
   {
       tokens.push_back(intermediate);
   }
-
+  // save the important information
   objName = tokens[0];
   outFileName = filePrefix + objName + fileSuffix;
 }
@@ -251,7 +250,7 @@ void Face2faceindex::Render()
 	glBegin(GL_TRIANGLES);
 
 	// we will loop in 3's, assuming CCW order
-	for (unsigned int vertex = 0; vertex < vertexID.size(); )
+	for (unsigned long vertex = 0; vertex < vertexID.size(); )
 		{ // per triangle
 		// use increment to step through them
 		Cartesian3 *v0 = &(vertices[vertexID[vertex++]]);

@@ -47,7 +47,7 @@ bool FaceIndex2DirectedEdge::ReadFile(std::string fileName)
   std::string cLine; // current line
   std::string delim = " ";
   std::string token; // for reading floats from line
-  int pos = 0;
+  long pos = 0;
 
   std::string a;
   float thisX, thisY, thisZ;
@@ -57,7 +57,7 @@ bool FaceIndex2DirectedEdge::ReadFile(std::string fileName)
   while(token != "Vertex")
   {
     inFile >> token;
-    if(inFile.eof()){ std::cout << "Reached EOF Unexpectedly" << '\n'; exit(0);; }
+    if(inFile.eof()){ std::cout << "Reached EOF Unexpectedly" << '\n'; exit(0); }
   }
 
   // read in unique vertices
@@ -73,6 +73,8 @@ bool FaceIndex2DirectedEdge::ReadFile(std::string fileName)
     inFile >> thisX >> thisY >> thisZ;
     // add to vertex
     vertices.push_back(Cartesian3(thisX, thisY, thisZ));
+
+    if(inFile.eof()){ std::cout << "Reached EOF Unexpectedly" << '\n'; exit(0); }
     pos++;
   }
   pos = 0;
@@ -83,7 +85,7 @@ bool FaceIndex2DirectedEdge::ReadFile(std::string fileName)
     // Eat Face after first line
     if(pos > 0){ inFile >> token;}
     // check for end of file
-    if(inFile.eof()){ break;}
+    if(inFile.eof()){ break;} // not an error this time as we are at end of file
     // Eat face ID
     inFile >> token;
     // read in the 3 vertex ID's from the face
@@ -97,7 +99,7 @@ bool FaceIndex2DirectedEdge::ReadFile(std::string fileName)
 
   // calculate the midPoint / min / max / ect
   Cartesian3 thisVertex;
-  for(unsigned int i = 0; i < vertexID.size(); i++)
+  for(unsigned long i = 0; i < vertexID.size(); i++)
   {
     // find the current vertex so we only lookup once
     thisVertex = vertices[vertexID[i]];
@@ -116,10 +118,8 @@ bool FaceIndex2DirectedEdge::ReadFile(std::string fileName)
 	// and also set the midpoint's location
 	midPoint = midPoint / vertexID.size();
 
-  std::cout << "MP: " << midPoint << '\n';
-
 	// now go back through the vertices, subtracting the mid point
-  for (unsigned int vertex = 0; vertex < vertices.size(); vertex++)
+  for (unsigned long vertex = 0; vertex < vertices.size(); vertex++)
 		{ // per vertex
 		vertices[vertex] = vertices[vertex] - midPoint * 2.;
 		} // per vertex
@@ -144,13 +144,15 @@ bool FaceIndex2DirectedEdge::ReadFile(std::string fileName)
   // now we should know if it is manifold or not
   if(manifold == 1)
   {
-    std::cout << "Is Manifold" << '\n';
+    std::cout << "\n\n\n\nMesh Is Manifold" << '\n';
+    calculateGenus();
   }
   else
   {
-    std::cout << "Is Not Manifold" << '\n';
+    std::cout << "\n\n\nMesh Is Not Manifold" << '\n';
+    std::cout << "Not Calculating Genus as not Manifold" << '\n';
   }
-  calculateGenus();
+
 	return true;
 } // FaceIndex2DirectedEdge::ReadFileFace()
 
@@ -183,31 +185,31 @@ bool FaceIndex2DirectedEdge::saveFile()
   // Save all the faces to the file
   outFile << saveOtherHalf();
 
-
-  // delete this
-  //debug();
-
   return 1;
 }
 
+// traverse through one ring
 void FaceIndex2DirectedEdge::checkPinchPoint()
 {
   // Calculate the degree of each face in one pass
-  std::vector<int> degrees;
+  std::vector<long> degrees;
   degrees.resize(vertices.size());
-  for(unsigned int i = 0; i < vertexID.size(); i++)
+  for(unsigned long i = 0; i < vertexID.size(); i++)
   {
     degrees[vertexID[i]]++;
   }
 
-  int startEdge;
-  int firstEdge;
-  int secondEdge;
-  int thirdEdge;
-  int nextFirst;
-  int thisDegree;
+  // start:                   first directed edge
+  // first, second and third: edges of current face
+  // nextFirst:               next faces first edge
+  long startEdge;
+  long firstEdge;
+  long secondEdge;
+  long thirdEdge;
+  long nextFirst;
+  long thisDegree;
 
-  for(unsigned int i = 0; i < vertices.size(); i++)
+  for(unsigned long i = 0; i < vertices.size(); i++)
   {
     startEdge = firstDirectedEdge[i];
 
@@ -236,7 +238,7 @@ void FaceIndex2DirectedEdge::checkPinchPoint()
   }
 }
 
-
+// uses formulas from slides to calculate first directed edge from each point
 void FaceIndex2DirectedEdge::calculateFirstDirectedEdge()
 {
   long h;
@@ -259,7 +261,7 @@ void FaceIndex2DirectedEdge::calculateFirstDirectedEdge()
     }
   }
 }
-
+// formats and saves to file
 std::string FaceIndex2DirectedEdge::saveDirEdges()
 {
   std::string out = "";
@@ -273,7 +275,7 @@ std::string FaceIndex2DirectedEdge::saveDirEdges()
   return out;
 }
 
-
+// most time consuming algorithm
 void FaceIndex2DirectedEdge::calculateOtherHalf()
 {
   // start and end vertexes of edges
@@ -317,6 +319,7 @@ void FaceIndex2DirectedEdge::calculateOtherHalf()
   }
 }
 
+// formats and saves to file
 std::string FaceIndex2DirectedEdge::saveOtherHalf()
 {
   std::string out = "";
@@ -340,11 +343,7 @@ void FaceIndex2DirectedEdge::calculateGenus()
   // v - e + f - 2 = -2g
   // e + 2 - f - v = 2g
   // g = (e + 2 - f - v) / 2
-  std::cout << "Vert: " << v << '\n';
-  std::cout << "Edges: " << e << '\n';
-  std::cout << "Faces: " << f << '\n';
 
   long g = (e + 2 - f - v) / 2;
   std::cout << "Genus: " << g << '\n';
-
 }
