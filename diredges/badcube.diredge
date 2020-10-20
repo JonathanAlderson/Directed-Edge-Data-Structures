@@ -1,0 +1,78 @@
+# University of Leeds 2020-2021
+# COMP 5812M Assignment 1
+# Jonathan Alderson
+# 201094818
+#
+# Object Name: badcube
+# Vertices=9 Faces=13
+#
+Vertex  0  -1.076923  -1.102564  -1.025641
+Vertex  1  -1.076923  -1.102564  0.974359
+Vertex  2  -1.076923  0.897436  0.974359
+Vertex  3  -1.076923  0.897436  -1.025641
+Vertex  4  0.923077  -1.102564  -1.025641
+Vertex  5  0.923077  0.897436  -1.025641
+Vertex  6  0.923077  -1.102564  0.974359
+Vertex  7  0.923077  0.897436  0.974359
+Vertex  8  0.923077  1.897436  0.974359
+FirstDirectedEdge 0   0
+FirstDirectedEdge 1   1
+FirstDirectedEdge 2   2
+FirstDirectedEdge 3   5
+FirstDirectedEdge 4   8
+FirstDirectedEdge 5   10
+FirstDirectedEdge 6   17
+FirstDirectedEdge 7   20
+FirstDirectedEdge 8   37
+Face  0  0  1  2
+Face  1  0  2  3
+Face  2  0  3  4
+Face  3  3  5  4
+Face  4  0  1  4
+Face  5  4  1  6
+Face  6  1  6  7
+Face  7  1  7  2
+Face  8  6  4  5
+Face  9  6  5  7
+Face  10  3  2  7
+Face  11  3  7  5
+Face  12  7  8  5
+OtherHalf 0   0
+OtherHalf 1   23
+OtherHalf 2   3
+OtherHalf 3   2
+OtherHalf 4   30
+OtherHalf 5   6
+OtherHalf 6   5
+OtherHalf 7   11
+OtherHalf 8   0
+OtherHalf 9   35
+OtherHalf 10   25
+OtherHalf 11   7
+OtherHalf 12   0
+OtherHalf 13   15
+OtherHalf 14   0
+OtherHalf 15   13
+OtherHalf 16   0
+OtherHalf 17   0
+OtherHalf 18   0
+OtherHalf 19   29
+OtherHalf 20   21
+OtherHalf 21   20
+OtherHalf 22   31
+OtherHalf 23   1
+OtherHalf 24   0
+OtherHalf 25   10
+OtherHalf 26   27
+OtherHalf 27   26
+OtherHalf 28   34
+OtherHalf 29   19
+OtherHalf 30   4
+OtherHalf 31   22
+OtherHalf 32   33
+OtherHalf 33   32
+OtherHalf 34   38
+OtherHalf 35   9
+OtherHalf 36   0
+OtherHalf 37   0
+OtherHalf 38   34
