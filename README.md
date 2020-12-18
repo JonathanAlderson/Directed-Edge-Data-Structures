@@ -13,6 +13,6 @@ Please read the [report](/Time_Complexity_Analysis_-_Jonathan_Alderson.pdf) to s
 
 Screenshots
 ======
-![1](/screenshot1.PNG)
-![2](/screenshot2.PNG)
-![3](/screenshot3.PNG)
+![1](/screenshot1.png)
+![2](/screenshot2.png)
+![3](/screenshot3.png)
